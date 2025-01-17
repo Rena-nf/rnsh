@@ -1,0 +1,22 @@
+# The usual stuff
+*           text=auto
+
+# Source
+*.rs            text        diff=rust
+*.toml          text        diff=toml
+Cargo.lock      text
+
+# Docs and stuff
+*.md            text        diff=markdown
+LICENSE         text
+TODO            text
+
+# Docker stuff
+Dockerfile      text
+.Dockeignore    text
+
+# Smth smth ignore
+*.*ignore       text
+.gitattributes  export-ignore
+.gitignore      export-ignore
+.gitkeep        export-ignore
