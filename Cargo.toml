@@ -8,4 +8,26 @@ license = "GPL-3.0-or-later"
 repository = "https://github.com/Rena-nf/rnsh"
 
 [dependencies]
+anyhow = "1.0.95"
 parking_lot = "0.12.3"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_derive = "1.0.217"
+toml = "0.8.19"
+whoami = "1.5.2"
+
+[profile.dev]
+debug = true
+incremental = true
+lto = "off"
+opt-level = 0
+overflow-checks = true
+panic = "abort"
+
+[profile.release]
+codegen-units = 1
+debug = 0
+lto = true
+opt-level = "s"
+overflow-checks = false
+panic = "unwind"
+strip = true

@@ -1,11 +1,30 @@
 use std::{
-    io::{stdin, stdout, Write},
+    env::current_dir,
+    io::{stdin, stdout, Error, Write},
+    path::PathBuf,
     process::{Child, Command, Stdio},
+    str::SplitWhitespace,
 };
 
-fn main() {
+use whoami::fallible;
+
+fn start_loop() {
+    let username: String = whoami::username();
+    let hostname: String = match fallible::hostname() {
+        Ok(x) => format!("@{}", x),
+        Err(_) => String::from(""),
+    };
+
+    let combined: String = format!("[{0}{1}]", username, hostname);
+
+    let current_folder: PathBuf = match current_dir() {
+        Ok(x) => x,
+        Err(_) => PathBuf::from("/"),
+    };
+
     loop {
-        print!("> ");
+        print!("{0} {1} $ ", combined, current_folder.display());
+
         let _ = stdout().flush();
 
         let mut input: String = String::new();
@@ -16,9 +35,9 @@ fn main() {
         let mut prev_parts: Option<Child> = None;
 
         while let Some(commands) = parts.next() {
-            let mut part = commands.split_whitespace();
-            let command = part.next().unwrap_or("Command Not Found");
-            let args = part;
+            let mut part: SplitWhitespace<'_> = commands.split_whitespace();
+            let command: &str = part.next().unwrap_or("Command Not Found");
+            let args: SplitWhitespace<'_> = part;
 
             match command {
                 "cd" => {
@@ -27,7 +46,7 @@ fn main() {
                 }
                 "exit" => return,
                 command => {
-                    let stdin = prev_parts.map_or(Stdio::inherit(), |output: Child| {
+                    let stdin: Stdio = prev_parts.map_or(Stdio::inherit(), |output: Child| {
                         Stdio::from(output.stdout.unwrap())
                     });
 
@@ -41,7 +60,7 @@ fn main() {
                         Stdio::inherit()
                     };
 
-                    let output = Command::new(command)
+                    let output: anyhow::Result<Child, Error> = Command::new(command)
                         .args(args)
                         .stdin(stdin)
                         .stdout(stdout)
@@ -64,6 +83,10 @@ fn main() {
     }
 }
 
+fn main() {
+    start_loop();
+}
+
 pub mod commands;
-pub mod lexers;
-pub mod shared;
+pub mod dir;
+pub mod parsers;
