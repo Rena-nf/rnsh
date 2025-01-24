@@ -1,29 +1,18 @@
 use std::{
-    env::current_dir,
-    io::{stdin, stdout, Error, Write},
-    path::PathBuf,
+    io::{stdin, stdout, Write},
     process::{Child, Command, Stdio},
     str::SplitWhitespace,
 };
 
-use whoami::fallible;
+use anyhow::Context;
+use clap::Parser;
+use users::Users;
 
-fn start_loop() {
-    let username: String = whoami::username();
-    let hostname: String = match fallible::hostname() {
-        Ok(x) => format!("@{}", x),
-        Err(_) => String::from(""),
-    };
-
-    let combined: String = format!("[{0}{1}]", username, hostname);
-
-    let current_folder: PathBuf = match current_dir() {
-        Ok(x) => x,
-        Err(_) => PathBuf::from("/"),
-    };
+fn start_loop(user: Users) {
+    let combined: String = format!("[{0}{1}]", user.username, user.hostname);
 
     loop {
-        print!("{0} {1} $ ", combined, current_folder.display());
+        print!("{0} {1} $ ", combined, user.home_dir.display());
 
         let _ = stdout().flush();
 
@@ -45,28 +34,26 @@ fn start_loop() {
                     prev_parts = None;
                 }
                 "exit" => return,
+
                 command => {
                     let stdin: Stdio = prev_parts.map_or(Stdio::inherit(), |output: Child| {
                         Stdio::from(output.stdout.unwrap())
                     });
 
                     let stdout = if parts.peek().is_some() {
-                        // If there's a piped command
-                        // Send the output to the next
                         Stdio::piped()
                     } else {
-                        // If there's no more, then
-                        // Send it to stdout
                         Stdio::inherit()
                     };
 
-                    let output: anyhow::Result<Child, Error> = Command::new(command)
+                    let output: anyhow::Result<Child, anyhow::Error> = Command::new(command)
                         .args(args)
                         .stdin(stdin)
                         .stdout(stdout)
-                        .spawn();
+                        .spawn()
+                        .context("Failed to create command spawn");
 
-                    match output {
+                    match output.with_context(|| format!("Failed to run command :{}", command)) {
                         Ok(x) => prev_parts = Some(x),
                         Err(e) => {
                             prev_parts = None;
@@ -84,9 +71,13 @@ fn start_loop() {
 }
 
 fn main() {
-    start_loop();
+    #[allow(unused_variables)]
+    let args: args::Args = args::Args::parse();
+    let user: Users = Users::new();
+
+    start_loop(user);
 }
 
+pub mod args;
 pub mod commands;
-pub mod dir;
-pub mod parsers;
+pub mod users;

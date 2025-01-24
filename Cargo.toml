@@ -9,6 +9,8 @@ repository = "https://github.com/Rena-nf/rnsh"
 
 [dependencies]
 anyhow = "1.0.95"
+clap = { version = "4.5.26", features = ["derive"] }
+homedir = "0.3.4"
 parking_lot = "0.12.3"
 serde = { version = "1.0.217", features = ["derive"] }
 serde_derive = "1.0.217"
