@@ -1,13 +1,11 @@
-use std::iter::Map;
-
 use crate::{alias::Alias, args::Args, users::Users};
 
+// Good luck to future me
 pub struct ShellInstance {
-    alias: Alias,
-    args: Args,
-    user: Users,
+    pub alias: Alias,
+    pub args: Args,
+    pub user: Users,
 }
 
-impl ShellInstance {
-    pub fn update_alias(new_alias: Map<&str, &str>) -> () {}
-}
+#[doc(hidden)]
+impl ShellInstance {}

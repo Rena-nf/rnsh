@@ -7,12 +7,17 @@ use std::{
 use anyhow::Context;
 use users::Users;
 
+/// Used to start the shell routine
+///
+/// init a user instance using `users::Users::new()` and pass it to the args
+// This whole function is God awful filthy but I'll leave cleaning to future me
 pub fn start_loop(user: Users) {
     let combined: String = format!("[{0}{1}]", user.username, user.hostname);
 
     loop {
         print!("{0} {1} $ ", combined, user.home_dir.display());
 
+        // To prevent taking input before shell prompt
         let _ = stdout().flush();
 
         let mut input: String = String::new();
@@ -32,8 +37,10 @@ pub fn start_loop(user: Users) {
                     commands::cd(args);
                     prev_parts = None;
                 }
+
                 "exit" => return,
 
+                // TODO : Figure out how to scale along with built-in commands
                 command => {
                     let stdin: Stdio = prev_parts.map_or(Stdio::inherit(), |output: Child| {
                         Stdio::from(output.stdout.unwrap())

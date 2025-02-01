@@ -10,6 +10,7 @@ pub struct Users {
     pub home_dir: PathBuf,
 }
 
+#[doc(hidden)]
 impl Users {
     pub fn new() -> Self {
         let hostname = match fallible::hostname() {
@@ -17,6 +18,8 @@ impl Users {
             Err(_) => String::from(""),
         };
 
+        // Should default to root when home directory is missing
+        // TODO: Test on windows
         let home = match homedir::my_home() {
             Ok(x) => x.unwrap(),
             Err(_) => {
@@ -36,6 +39,8 @@ impl Users {
     }
 }
 
+#[doc(hidden)]
+// Not sure why i need this but i'm just following clippy
 impl Default for Users {
     fn default() -> Self {
         Self::new()
