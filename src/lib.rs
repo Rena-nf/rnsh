@@ -79,5 +79,6 @@ pub fn start_loop(user: Users) {
 pub mod alias;
 pub mod args;
 pub mod commands;
+pub mod file;
 pub mod instance;
 pub mod users;

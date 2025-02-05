@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use whoami::fallible;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Users {
     pub username: String,
     pub hostname: String,
