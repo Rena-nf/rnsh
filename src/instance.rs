@@ -1,11 +1,10 @@
-use crate::{alias::Alias, args::Args, users::Users};
+use crate::{alias::Alias, users::Users};
 use serde::Deserialize;
 
 // Good luck to future me
 #[derive(Deserialize)]
 pub struct ShellInstance {
     pub alias: Option<Alias>,
-    pub args: Option<Args>,
     pub user: Option<Users>,
 }
 

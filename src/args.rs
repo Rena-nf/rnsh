@@ -1,16 +1,18 @@
-use clap::Parser;
-use serde::Deserialize;
+use std::path::PathBuf;
 
-const ABOUT: &str = "A simple shell made in rust made in boredom";
+use clap::{command, value_parser, Arg};
 
-/// To print help and handle some config option
-#[derive(Parser, Debug, Deserialize)]
-#[command(version, about, long_about = ABOUT)]
-pub struct Args {
-    #[arg(short, long, default_value = None)]
-    pub config: Option<String>,
-    #[arg(short, long, default_value = None)]
-    pub enable_history: Option<bool>,
+pub fn get_args() {
+    let config = Arg::new("config")
+        .short('c')
+        .long("config")
+        .help("Load config file")
+        .long_help("Load config file, default to \"rnsh.config.toml\"")
+        .value_parser(value_parser!(PathBuf));
+
+    let matches = command!().arg(config).get_matches();
+
+    if let Some(c) = matches.get_one::<String>("config") {
+        println!("Value for config is : {}", c);
+    }
 }
-
-impl Args {}

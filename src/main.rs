@@ -1,5 +1,4 @@
-use clap::Parser;
-use rnsh::{args, start_loop, users::Users};
+use rnsh::{args::get_args, start_loop, users::Users};
 
 /// A Simple shell / command spawn
 ///
@@ -9,8 +8,7 @@ use rnsh::{args, start_loop, users::Users};
 /// to run it you can either do cargo run / cargo build and then do rnsh (-h to get help)
 fn main() {
     // TODO : Implement args function
-    #[allow(unused_variables)]
-    let args: args::Args = args::Args::parse();
+    get_args();
     let user: Users = Users::new();
 
     start_loop(user);
